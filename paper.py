@@ -136,6 +136,7 @@ class ArxivPaper:
     def tldr(self) -> str:
         introduction = ""
         conclusion = ""
+        experiments = ""
         if self.tex is not None:
             content = self.tex.get("all")
             if content is None:
@@ -151,27 +152,38 @@ class ArxivPaper:
             match = re.search(r'\\section\{Introduction\}.*?(\\section|\\end\{document\}|\\bibliography|\\appendix|$)', content, flags=re.DOTALL)
             if match:
                 introduction = match.group(0)
+            else:
+                match = re.search(r'\\section.*?(\\section|\\end\{document\}|\\bibliography|\\appendix|$)', content, flags=re.DOTALL)
+                if match:
+                    introduction = match.group(0)
+                else:
+                    introduction = content
             match = re.search(r'\\section\{Conclusion\}.*?(\\section|\\end\{document\}|\\bibliography|\\appendix|$)', content, flags=re.DOTALL)
             if match:
                 conclusion = match.group(0)
+            match = re.search(r'\\section\{Experiments\}.*?(\\section|\\end\{document\}|\\bibliography|\\appendix|$)', content, flags=re.DOTALL)
+            if match:
+                experiments = match.group(0)
         llm = get_llm()
-        prompt = """Given the title, abstract, introduction and the conclusion (if any) of a paper in latex format, generate a one-sentence TLDR summary in __LANG__:
+        prompt = """Given the title, abstract, introduction, experiments, and the conclusion (if any) of a paper in latex format, please help me summarize the background of this paper, the main problem addressed, the core contributions, and the experimental results in __LANG__:
         
         \\title{__TITLE__}
         \\begin{abstract}__ABSTRACT__\\end{abstract}
         __INTRODUCTION__
+        __EXPERIMENTS__
         __CONCLUSION__
         """
         prompt = prompt.replace('__LANG__', llm.lang)
         prompt = prompt.replace('__TITLE__', self.title)
         prompt = prompt.replace('__ABSTRACT__', self.summary)
         prompt = prompt.replace('__INTRODUCTION__', introduction)
+        prompt = prompt.replace('__EXPERIMENTS__', experiments)
         prompt = prompt.replace('__CONCLUSION__', conclusion)
 
         # use gpt-4o tokenizer for estimation
         enc = tiktoken.encoding_for_model("gpt-4o")
         prompt_tokens = enc.encode(prompt)
-        prompt_tokens = prompt_tokens[:4000]  # truncate to 4000 tokens
+        prompt_tokens = prompt_tokens[:8000]  # truncate to 4000 tokens
         prompt = enc.decode(prompt_tokens)
         
         tldr = llm.generate(
