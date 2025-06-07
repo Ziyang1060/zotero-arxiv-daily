@@ -165,7 +165,7 @@ class ArxivPaper:
             if match:
                 experiments = match.group(0)
         llm = get_llm()
-        prompt = """Given the title, abstract, introduction, experiments, and the conclusion (if any) of a paper in latex format, please help me summarize the background of this paper, the main problem addressed, the core contributions, and the experimental results in __LANG__:
+        prompt = """我会提供给你一篇采用 LaTeX 格式撰写的英文论文内容，包括标题、摘要、引言、实验部分以及结论，你需要用中文为我总结该论文的研究背景、所解决的主要问题、核心贡献以及实验结果:
         
         \\title{__TITLE__}
         \\begin{abstract}__ABSTRACT__\\end{abstract}
@@ -173,7 +173,7 @@ class ArxivPaper:
         __EXPERIMENTS__
         __CONCLUSION__
         """
-        prompt = prompt.replace('__LANG__', llm.lang)
+        # prompt = prompt.replace('__LANG__', llm.lang)
         prompt = prompt.replace('__TITLE__', self.title)
         prompt = prompt.replace('__ABSTRACT__', self.summary)
         prompt = prompt.replace('__INTRODUCTION__', introduction)
@@ -190,7 +190,7 @@ class ArxivPaper:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an assistant who perfectly summarizes scientific paper, and gives the core idea of the paper to the user.",
+                    "content": "你是一个能够清晰总结论文并向用户提炼论文核心观点的科研助手。",
                 },
                 {"role": "user", "content": prompt},
             ]
