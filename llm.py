@@ -32,10 +32,10 @@ class LLM:
                     if attempt == max_retries - 1:
                         raise
                     sleep(3)
-            return response.choices[0].message.content
+            return response.choices[0].message.content.replace("**", "").strip()
         else:
             response = self.llm.create_chat_completion(messages=messages,temperature=0)
-            return response["choices"][0]["message"]["content"]
+            return response["choices"][0]["message"]["content"].replace("**", "").strip()
 
 def set_global_llm(api_key: str = None, base_url: str = None, model: str = None, lang: str = "English"):
     global GLOBAL_LLM
