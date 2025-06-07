@@ -172,7 +172,10 @@ class ArxivPaper:
         __INTRODUCTION__
         __EXPERIMENTS__
         __CONCLUSION__
-        """
+        
+        你的总结需要以一段文字的形式直接呈现给科研工作者，所以不要包含任何 markdown 语法的格式，并且要逻辑鲜明，重点明确。
+        同时你需要对论文内容进行批判性思考，列出可能存在的局限性和未来有价值、新颖的研究方向，为科研工作者提供宝贵参考。"""
+        
         # prompt = prompt.replace('__LANG__', llm.lang)
         prompt = prompt.replace('__TITLE__', self.title)
         prompt = prompt.replace('__ABSTRACT__', self.summary)
